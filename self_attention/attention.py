@@ -93,7 +93,7 @@ class MultiHeadAttention(nn.Module):
         self.Q = nn.Linear(d_in, d_out, bias=qkv_bias)
         self.K = nn.Linear(d_in, d_out, bias=qkv_bias)
         self.V = nn.Linear(d_in, d_out, bias=qkv_bias)
-        self.out_proj = nn.Linear(d_in, d_out)
+        self.out_proj = nn.Linear(d_out, d_out)
         self.dropout = nn.Dropout(dropout)
         self.register_buffer(
             'mask',
@@ -112,7 +112,7 @@ class MultiHeadAttention(nn.Module):
         
         keys = keys.transpose(1, 2)
         queries = queries.transpose(1, 2)
-        values = queries.transpose(1, 2)
+        values = values.transpose(1, 2)
         
         attn_scores = queries @ keys.transpose(2, 3)
         mask_bool = self.mask.bool()[:num_tokens, :num_tokens]
@@ -127,7 +127,7 @@ class MultiHeadAttention(nn.Module):
         
         context_vec = (attn_weights @ values).transpose(1, 2)
         
-        context_vec = context_vec.contigous().view(
+        context_vec = context_vec.contiguous().view(
             b, num_tokens, self.d_out
         )
         
